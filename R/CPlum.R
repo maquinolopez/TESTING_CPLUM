@@ -15,13 +15,21 @@ runCPlum=function(folder,DataPb,DataC,iterations=1e+3,by=5.0,number_supported=FA
                 memory_shape=4., memory_mean=.7,fi_mean=50,fi_acc=2,
                 As_mean=20,As_acc=2,resolution=200,
                  acc_shape=1.5,acc_mean=20,cc=1,ccpb=0,Sample_year=2017,seeds=12345678){
+  library(rPython)
+  folder=paste(normalizePath(folder),"/",sep="")
+  Lead=read.table(paste(folder,DataPb,sep=""),sep=",")
 
 
-library(rPython)
-Lead=read.table(paste(folder,DataPb,sep=""),sep=",")
-
-if(number_supported==FALSE){
-
+  if (by==TRUE){
+    by=(Lead[length(Lead[,1]),1])/10#25
+  }
+  
+  
+  
+  
+  
+  
+  if(number_supported==FALSE){
   if(length(Lead[1,])==5){
     n.check=check.equi(Lead)
     print(n.check[1])
@@ -44,8 +52,8 @@ if(number_supported==FALSE){
     usemod=1
   }else if(length(Lead[1,])==7){
     cat("You have 226Ra data. \n")
-    plot(Lead$V1,Lead$V6,pch=16,ylim=c(min(Lead$V6-Lead$V7),max(Lead$V6+Lead$V7)), ylab="Concentration of 226Ra", xlab="Depth (cm)")
-    segments(Lead$V1, Lead$V6-Lead$V7, x1 = Lead$V1, y1 = Lead$V6+Lead$V7)
+    plot(Lead[,1],Lead[,6],pch=16,ylim=c(min(Lead[,6]-Lead[,7]),max(Lead[,6]+Lead[,7])), ylab="Concentration of 226Ra", xlab="Depth (cm)")
+    segments(Lead[,1], Lead[,6]-Lead[,7], x1 = Lead[,1], y1 = Lead[,6]+Lead[,7])
     cat("Plum can assum to have a constant supported 210Pb and use the 226Ra data to infer this one value\n")
     cat("Plum can also assum individual supporeted 210Pb per data point.\n
         It is important to consider that this will greatly increses the computing time and it should only be use when clear parters are observed in the 226Ra data.\n")
@@ -60,9 +68,8 @@ if(number_supported==FALSE){
 
 
 
-modirec=path.package("Plum", quiet = T)
+modirec=path.package("CPlum", quiet = T)
 ccdir=paste(modirec,"/","Calibration Curves/",sep="")
-twalk=paste(modirec,"/","pytwalk.py",sep="")
 if (usemod==1){
   MCMC=paste(modirec,"/","CaPb.py",sep="")
 }else if(usemod==2){
@@ -72,7 +79,6 @@ if (usemod==1){
 
 print(MCMC)
 
-python.load(twalk)
 python.load(MCMC)
 dir.create(paste(folder,"Results",sep = ""))
 
