@@ -413,7 +413,6 @@ slopes= function(folder,...){
 #' @export
 ageof=function(folder,x,interval=.95){
   folder=paste(normalizePath(folder),"/",sep="")
-  
   foldertmp=length(unlist(strsplit(folder,'')))
   foldertmp=substr(folder,foldertmp,foldertmp)
   if(foldertmp=="/"){
@@ -477,6 +476,46 @@ ageof=function(folder,x,interval=.95){
 
 }
 
+
+#' @export
+ageofOLD=function(x,interval=.95,folder){
+  folder=paste(normalizePath(folder),"/",sep="")
+  foldertmp=length(unlist(strsplit(folder,'')))
+  foldertmp=substr(folder,foldertmp,foldertmp)
+  if(x!=0){
+    Ages=read.table(paste(folder,"Results/dates.csv",sep=""),sep=" ")
+    intervals=read.table(paste(folder,"Results/intervals.csv",sep=""),sep=",")
+    Depths=as.numeric(read.table(paste(folder,"Results/depths.csv",sep=""),sep=",") )
+    Slopes=read.table(paste(folder,"Results/Slopes.csv",sep=""),sep=",")
+    depfix=which(Depths<x)
+    depfix=depfix[length(depfix)]
+    m2=Slopes[,depfix]
+    sumages=c()
+
+    if(depfix!=1){
+      for (i in 1:length(Ages[,1])){
+        sumages=c(sumages, Ages[i,(depfix-1)] + Slopes[i,depfix]* (x-Depths[depfix]) )
+        
+      }
+    }else{sumages= Slopes[,depfix]* (x)}
+    
+#    print(sumages)
+    n=length(Ages[,1])
+    mean1=mean(sumages[-length(sumages)])
+
+    inter=(1-interval)/2
+    lim1=sort(sumages)[as.integer(n*inter)]
+    
+    lim2=sort(sumages)[as.integer(n*(inter+interval))]
+
+
+    return(list(Mean=mean1,Lower_lim=lim1,Upper_lim=lim2))
+    
+  }else{
+    print("For depth 0, the age is equal to the collection date.")
+  }
+  
+}
 
 
 

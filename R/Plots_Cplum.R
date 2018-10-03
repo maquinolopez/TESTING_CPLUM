@@ -68,26 +68,7 @@ fullchronologyC= function(folder,DataP,DataC,resolution=200,supp_type=1,Sample_y
   polygon(d, col=gray(.6))
   lines(seq(0,350,.05),dgamma(seq(0,350,.05),fi_acc,scale=fi_mean/fi_acc),col="green")
 
-  plot(-1,-1, xlim=c(0,(Depths[length(Depths)])),ylim = c((1950-Sample_year), (maxA+2)),xlab = "Depth (cm)",ylab="Age (years)" ,
-       xaxs="i",yaxs="i",main= gsub("\\..*","",DataP))
-  for (i2 in 1:(resolution-1)){
-    for (i in 1:(resolution-1) ){
-      rect(deptsSeq[i2], ageSeq[i]+1950-Sample_year, deptsSeq[i2+1], ageSeq[i+1]+1950-Sample_year, density = NA, border = NA,
-           col = gray((1-Plotval[i2,i])))
-    }
-  }
-  lines(Depths,c(1950-Sample_year,intervals[,2]),type="l", lty=2, lwd=1,col="red")
-  lines(Depths,(c(1950-Sample_year,intervals[,4])),type="l", lty=2, lwd=1,col="red")
-  lines(Depths,(c(1950-Sample_year,intervals[,3])),type="l", lty=2, lwd=1,col="red")
-  for (i in 1:length(Lead[,1])){
-    rug(Lead[i,1], lwd = Lead[i,5],col = "blue")
-  }
-
-
-  for (i in 1:length(Carbon[,1])){
-      plot14C(cdate = as.numeric(Carbon[i,]),cc = cc,ccpb = ccpb,S_year = Sample_year)
-  }
-
+  chronologylinesC(folder,DataP,DataC,Sample_year,cc )
 
 
   par(mfrow=c(1,1))
@@ -118,13 +99,15 @@ plot(Depths,c(1950-Sample_year,Ages[2,]),type="l",col=rgb(0,0,0,.01), lwd=2,ylim
 for (i in 1:(iterations-1)){
   lines(Depths,c(1950-Sample_year,Ages[i,]),type="l",col=rgb(0,0,0,.01), lwd=2)
 }
-lines(Depths,c(1950-Sample_year,intervals[,2]),type="l", lty=2, lwd=1,col="black")
-lines(Depths,(c(1950-Sample_year,intervals[,4])),type="l", lty=2, lwd=1,col="black")
+lines(Depths,c(1950-Sample_year,intervals[,2]),type="l", lty=2, lwd=1,col="red")
+lines(Depths,(c(1950-Sample_year,intervals[,4])),type="l", lty=2, lwd=1,col="red")
 lines(Depths,(c(1950-Sample_year,intervals[,3])),type="l", lty=2, lwd=1,col="red")
 
 for (i in 1:length(Lead[,1])){
-  rug(Lead[i,1], lwd = Lead[i,5],col = "blue")
-}
+#  print(Lead[i,1]+Lead[i,5])
+  rect(xleft = Lead[i,1]-Lead[i,5],ybottom =1950-Sample_year-10, xright = Lead[i,1],ytop =  1950-Sample_year,col=rgb(0,0,1,.8))
+  
+  }
 
 
 
@@ -198,8 +181,9 @@ ageof=function(x,interval=.95,folder,Data){
 
 
 plot14C <- function(cdate,cc,ccpb,S_year){
+  print(cdate)
   library(rPython)
-  modirec=path.package("Plum", quiet = T)
+  modirec=path.package("CPlum", quiet = T)
   ccdir=paste(modirec,"/Calibration Curves/",sep="")
   python.load(paste(modirec,"/","CaPb.py",sep="") )
   Xs=python.call( "invlookup",cdate[1],cdate[2],cc,ccpb,ccdir)
@@ -208,7 +192,7 @@ plot14C <- function(cdate,cc,ccpb,S_year){
   for (ic in Xs){
     Ys=c(Ys,Calibrate(ic,cdate[-3],cc,ccpb))
   }
-  Ys=(Ys/max(Ys))*1.5
+  Ys=(Ys/max(Ys))*.5
   S_year=1950-S_year
 
 

@@ -11,7 +11,7 @@
 
 #' @export
 
-runCPlum=function(folder,DataPb,DataC,iterations=1e+3,by=5.0,number_supported=FALSE,detection_limit=.05,
+runCPlum=function(folder,DataPb,DataC,iterations=2e+3,by=5.0,number_supported=FALSE,detection_limit=.05,
                 memory_shape=4., memory_mean=.7,fi_mean=50,fi_acc=2,
                 As_mean=20,As_acc=2,resolution=200,
                  acc_shape=1.5,acc_mean=20,cc=1,ccpb=0,Sample_year=2017,seeds=12345678){
@@ -19,10 +19,13 @@ runCPlum=function(folder,DataPb,DataC,iterations=1e+3,by=5.0,number_supported=FA
   folder=paste(normalizePath(folder),"/",sep="")
   Lead=read.table(paste(folder,DataPb,sep=""),sep=",")
 
-
-  if (by==TRUE){
+  
+  print("the length")
+  print(by)
+  if (as.character(by)==TRUE){
     by=(Lead[length(Lead[,1]),1])/10#25
   }
+  print(by)
   
   
   
@@ -254,7 +257,7 @@ check.qui.Ra = function(rawdat){
 #' @export
 Calibrate =function(x,cdate,cc,ccpb){
   library(rPython)
-  modirec=path.package("Plum", quiet = T)
+  modirec=path.package("CPlum", quiet = T)
   ccdir=paste(modirec,"/",sep="")
   MCMC=paste(modirec,"/","CaPb.py",sep="")
   python.load(MCMC)
