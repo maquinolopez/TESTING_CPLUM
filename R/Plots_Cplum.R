@@ -98,7 +98,7 @@ chronologylinesC= function(folder,DataP,DataC,Sample_year=2017,cc=1,ccpb=0,main1
 
 plot(Depths,c(1950-Sample_year,Ages[2,]),type="l",col=rgb(0,0,0,.01), lwd=2,
      ylim = c(1950-Sample_year,max(Ages[,length(Ages[1,])])),
-     xlab = "Depth (cm)",ylab="Age (years)",main= main1)
+     xlab = "Depth (cm)",ylab="cal yr BP",main= main1)
 for (i in 1:(iterations-1)){
   lines(Depths,c(1950-Sample_year,Ages[i,]),type="l",col=rgb(0,0,0,.01), lwd=2)
 }
