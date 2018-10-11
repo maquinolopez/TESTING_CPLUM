@@ -7,7 +7,7 @@ from scipy.stats import uniform as unif
 from matplotlib.pyplot import plot, close, show, savefig,hist, xlabel, ylabel, title,axis,subplot, figure, setp
 from numpy.random import seed
 
-def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,n_supp,det_lim,iterations, by,shape1_m,mean_m,shape_acc,mean_acc,fi_mean,fi_acc,As_mean,As_acc,cc,ccpb,resolution,seeds):
+def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,n_supp,det_lim,iterations, by,shape1_m,mean_m,shape_acc,mean_acc,fi_mean,fi_acc,As_mean,As_acc,cc,ccpb,resolution,seeds,burnin,thi):
 	seed(int(seeds))
 	print(unif.rvs(size=1,loc=50, scale=200) )
 	##################### Data
@@ -133,7 +133,7 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,n_supp,det_lim,iteration
 		return tmp3
 
 	def last_t(fi):
-		return ( (1/lam)*log(fi/det_lim) )
+		return (1./lam)*log(fi/(lam*det_lim)) #( (1/lam)*log(fi/det_lim) )
 
 
 	def times(x,param):
@@ -334,10 +334,10 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,n_supp,det_lim,iteration
 	################## New MCMC test
 	print("the number of itrations,")
 	print(iterations)
-	thi = int((len(x)))*50 #100
+	thi = int((len(x)))*thi #100
 	print("Thining,")
 	print(thi)
-	burnin=10000*len(xp) #20000
+	burnin=burnin*len(xp) #20000
 	print("Burnin,")
 	print(burnin)
 	print("Total iterations,")

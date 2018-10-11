@@ -8,7 +8,7 @@ from matplotlib.pyplot import plot, close, show, savefig,hist, xlabel, ylabel, t
 from numpy.random import seed
 
 
-def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iterations, by,shape1_m,mean_m,shape_acc,mean_acc,fi_mean,fi_acc,As_mean,As_acc,cc,ccpb,resolution,seeds):
+def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iterations, by,shape1_m,mean_m,shape_acc,mean_acc,fi_mean,fi_acc,As_mean,As_acc,cc,ccpb,resolution,seeds,burnin,thi):
 	seed(int(seeds))
 	print(unif.rvs())
 	##################### Data
@@ -139,7 +139,7 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 		return tmp3
 
 	def last_t(fi):
-		return ( (1/lam)*log(fi/det_lim) )
+		return (1./lam)*log(fi/(lam*det_lim)) #( (1/lam)*log(fi/det_lim) )
 
 
 	def times(x,param):
