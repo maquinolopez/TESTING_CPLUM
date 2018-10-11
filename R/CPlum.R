@@ -13,7 +13,7 @@
 
 runCPlum=function(folder,DataPb,DataC,iterations=2e+3,by=5.0,number_supported=FALSE,detection_limit=.05,
                 memory_shape=4., memory_mean=.7,fi_mean=50,fi_acc=2,
-                As_mean=20,As_acc=2,resolution=200,
+                As_mean=20,As_acc=2,resolution=200,burnin=1000,thi=10,
                  acc_shape=1.5,acc_mean=20,cc=1,ccpb=0,Sample_year=2017,seeds=12345678){
   library(rPython)
   folder=paste(normalizePath(folder),"/",sep="")
@@ -87,7 +87,7 @@ dir.create(paste(folder,"Results",sep = ""))
 
 python.call("runmod",folder,DataPb,DataC,ccdir,FALSE,TRUE, Sample_year,   number_supported   ,    detection_limit   ,
             iterations,  by ,memory_shape     ,memory_mean    ,acc_shape       ,acc_mean,
-            fi_mean,fi_acc, As_mean,As_acc,   cc,ccpb,resolution,seeds)
+            fi_mean,fi_acc, As_mean,As_acc,   cc,ccpb,resolution,seeds,burnin,thi)
 
                      #dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,
 #           iterations, by,shape1_m,          mean_m,       shape_acc,          mean_acc,
