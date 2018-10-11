@@ -68,7 +68,7 @@ fullchronologyC= function(folder,DataP,DataC,resolution=200,supp_type=1,Sample_y
   polygon(d, col=gray(.6))
   lines(seq(0,350,.05),dgamma(seq(0,350,.05),fi_acc,scale=fi_mean/fi_acc),col="green")
 
-  chronologylinesC(folder,DataP,DataC,Sample_year,cc )
+  chronologylinesC(folder,DataP,DataC,Sample_year,cc)
 
 
   par(mfrow=c(1,1))
@@ -79,7 +79,7 @@ fullchronologyC= function(folder,DataP,DataC,resolution=200,supp_type=1,Sample_y
 
 
 #' @export
-chronologylinesC= function(folder,DataP,DataC,Sample_year=2017,cc=1,ccpb=0){
+chronologylinesC= function(folder,DataP,DataC,Sample_year=2017,cc=1,ccpb=0,main1=T){
   Ages=read.table(paste(folder,"Results/dates.csv",sep=""),sep=" ")
   Ages=Ages+1950-Sample_year
   intervals=read.table(paste(folder,"Results/intervals.csv",sep=""),sep=",")
@@ -92,10 +92,13 @@ chronologylinesC= function(folder,DataP,DataC,Sample_year=2017,cc=1,ccpb=0){
   Slopes=read.table(paste(folder,"Results/Slopes.csv",sep=""),sep=",")
   num_var=length(Output[0,])
   iterations=length(Ages[,1])
+  
+  if(main1==T){main1=gsub("\\..*","",DataP)}
 
 
-plot(Depths,c(1950-Sample_year,Ages[2,]),type="l",col=rgb(0,0,0,.01), lwd=2,ylim = c(1950-Sample_year,max(Ages[,length(Ages[1,])])),
-     xlab = "Depth (cm)",ylab="Age (years)",main= gsub("\\..*","",DataP))
+plot(Depths,c(1950-Sample_year,Ages[2,]),type="l",col=rgb(0,0,0,.01), lwd=2,
+     ylim = c(1950-Sample_year,max(Ages[,length(Ages[1,])])),
+     xlab = "Depth (cm)",ylab="Age (years)",main= main1)
 for (i in 1:(iterations-1)){
   lines(Depths,c(1950-Sample_year,Ages[i,]),type="l",col=rgb(0,0,0,.01), lwd=2)
 }
