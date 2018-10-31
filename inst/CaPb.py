@@ -340,7 +340,7 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 	################## New MCMC test
 	print("the number of itrations,")
 	print(iterations)
-	thi = int((len(x)))*50 #100
+	thi = int((len(x)))*thi#100
 	print("Thining,")
 	print(thi)
 	burnin=10000*len(xp) #20000

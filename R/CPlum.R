@@ -12,7 +12,7 @@
 #' @export
 
 runCPlum=function(folder,DataPb,DataC,iterations=2e+3,by=5.0,number_supported=FALSE,detection_limit=.05,
-                memory_shape=4., memory_mean=.7,fi_mean=50,fi_acc=2,
+                memory_shape=4., memory_mean=.4,fi_mean=50,fi_acc=2,
                 As_mean=20,As_acc=2,resolution=200,burnin=1000,thi=10,
                  acc_shape=1.5,acc_mean=20,cc=1,ccpb=0,Sample_year=2017,seeds=12345678){
   library(rPython)

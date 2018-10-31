@@ -2,7 +2,7 @@
 
 fullchronologyC= function(folder,DataP,DataC,resolution=200,supp_type=1,Sample_year=2017,cc=1,ccpb=0,
                          memory_shape=4., memory_mean=.7,acc_shape=1.5,acc_mean=20,
-                         fi_mean=50,fi_acc=2,As_mean=20,As_acc=2){
+                         fi_mean=50,fi_acc=2,As_mean=20,As_acc=2,w_plot=.8){
   par(mfrow=c(1,1))
   Ages=read.table(paste(folder,"Results/dates.csv",sep=""),sep=" ")
   Ages=Ages+1950-Sample_year
@@ -68,7 +68,7 @@ fullchronologyC= function(folder,DataP,DataC,resolution=200,supp_type=1,Sample_y
   polygon(d, col=gray(.6))
   lines(seq(0,350,.05),dgamma(seq(0,350,.05),fi_acc,scale=fi_mean/fi_acc),col="green")
 
-  chronologylinesC(folder,DataP,DataC,Sample_year,cc)
+  chronologylinesC(folder,DataP,DataC,Sample_year,cc,ccpb,w = w_plot)
 
 
   par(mfrow=c(1,1))
@@ -79,7 +79,7 @@ fullchronologyC= function(folder,DataP,DataC,resolution=200,supp_type=1,Sample_y
 
 
 #' @export
-chronologylinesC= function(folder,DataP,DataC,Sample_year=2017,cc=1,ccpb=0,main1=T){
+chronologylinesC= function(folder,DataP,DataC,Sample_year=2017,cc=1,ccpb=0,main1=T,w=.8){
   Ages=read.table(paste(folder,"Results/dates.csv",sep=""),sep=" ")
   Ages=Ages+1950-Sample_year
   intervals=read.table(paste(folder,"Results/intervals.csv",sep=""),sep=",")
@@ -115,7 +115,7 @@ for (i in 1:length(Lead[,1])){
 
 
 for (i in 1:length(Carbon[,1])){
-  plot14C(cdate = as.numeric(Carbon[i,]),cc = cc,ccpb = ccpb,S_year = Sample_year)
+  plot14C(cdate = as.numeric(Carbon[i,]),cc = cc,ccpb = ccpb,S_year = Sample_year,w = .5)
 }
 
 
@@ -183,19 +183,19 @@ ageof=function(x,interval=.95,folder,Data){
 }
 
 
-plot14C <- function(cdate,cc,ccpb,S_year){
+plot14C <- function(cdate,cc,ccpb,S_year,w=.8){
   print(cdate)
   library(rPython)
   modirec=path.package("CPlum", quiet = T)
   ccdir=paste(modirec,"/Calibration Curves/",sep="")
   python.load(paste(modirec,"/","CaPb.py",sep="") )
   Xs=python.call( "invlookup",cdate[1],cdate[2],cc,ccpb,ccdir)
-  Xs=seq(Xs[1],Xs[2],length.out = 200)
+  Xs=seq(Xs[1],Xs[2],length.out = 150)
   Ys=c()
   for (ic in Xs){
     Ys=c(Ys,Calibrate(ic,cdate[-3],cc,ccpb))
   }
-  Ys=(Ys/max(Ys))*.5
+  Ys=(Ys/max(Ys))*w
   S_year=1950-S_year
 
 
