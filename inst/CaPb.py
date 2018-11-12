@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 #include <Python.h>
 	#####################  Librerias
-from numpy import isnan,savetxt,genfromtxt, array, log, unique, exp, append,concatenate,zeros, repeat,linspace,matrix
+from numpy import isnan,savetxt,genfromtxt, array, log, unique, exp, append,concatenate,zeros, repeat,linspace,matrix,isnan,interp
 import cProfile
 from scipy.stats import uniform as unif
 from matplotlib.pyplot import plot, close, show, savefig,hist, xlabel, ylabel, title,axis,subplot, figure, setp
@@ -175,29 +175,43 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 	def incallookup(points):
 		result =[]
 		for i in points:
-		   if i<0:
-			   down=1
-			   if i > -61.2:
-				   while i > ic[down][0]:
-					   down += 1
-			   else:
-				   down=1
-			   up = down-1
-		   elif i < 14000:
-			   down = int(i/5.+1)+npost
-			   up = down-1
-		   elif i < 25000:
-			   down = (2791+int((i-14000.)/10))+npost
-			   up = down -1
-		   else:
-			   down = +(3891+int((i-25000)/20)) +npost
-			   up=down -1
-		   icdown0=ic[down,0]  #CalBp
-		   icdown1=ic[down,1]  #CalRC
-		   icdown2=ic[down,2]  #SD
-		   prop = (i - icdown0)/(ic[up,0]-icdown0)
-		   mean = prop*(ic[up,1]-icdown1)+icdown1
-		   var = prop*(ic[up,2]-icdown2)+icdown2
+#		   if i<0:
+#			   up=1
+#			   if i > -61.2:
+#				   while i > ic[up][0]:
+#					   up += 1
+#			   else:
+#				   up=1
+#			   down = up-1
+#		   elif i < 14000:
+#			   down = int(i/5.+1)+npost
+#			   up = down-1
+#		   elif i < 25000:
+#			   down = (2791+int((i-14000.)/10))+npost
+#			   up = down -1
+#		   else:
+#			   down = +(3891+int((i-25000)/20)) +npost
+#			   up=down -1
+		   mean=interp(i,ic[:,0],ic[:,1])
+		   var =interp(i,ic[:,0],ic[:,2])
+#		   icdownx=ic2[up,0]
+#		   icdowny=ic2[up,1]
+#		   icdowny2=ic2[up,2]
+#		   icupx=ic2[down,0]
+#		   icupy=ic2[down,1]
+#		   icupy2=ic2[down,2]
+#		   prop =  (icupy -icdowny )/(icupx-icdownx)*i     #(i - icdown0)/(ic2[up,0]-icdown0)
+#		   prop2 = (icupy2-icdowny2)/(icupx-icdownx)*i
+#		   prop =  ((icupy -icdowny )/(icupx-icdownx))     #(i - icdown0)/(ic2[up,0]-icdown0)
+#		   prop2 = ((icupy2-icdowny2)/(icupx-icdownx))
+#		   mean = prop*(i-icdownx) + icdowny
+#		   var = prop**(i-icdownx)  + icdowny2
+#		   icdown0=ic[down,0]  #CalBp
+#		   icdown1=ic[down,1]  #CalRC
+#		   icdown2=ic[down,2]  #SD
+#		   prop = (i - icdown0)/(ic[up,0]-icdown0)
+#		   mean = prop*(ic[up,1]-icdown1)+icdown1
+#		   var = prop*(ic[up,2]-icdown2)+icdown2
 		   result.append ([mean,var])
 		return result
 
@@ -333,19 +347,19 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 		m_ini_2=unif.rvs(size=m,loc=0, scale=1)
 		xp=append(append(append(fi_ini_2,supp_ini_2),w_ini0), m_ini_2)
 
-	print("initial values were obtained")
+	#print("initial values were obtained")
 
 
 
 	################## New MCMC test
-	print("the number of itrations,")
-	print(iterations)
-	thi = int((len(x)))*thi#100
-	print("Thining,")
-	print(thi)
-	burnin=10000*len(xp) #20000
-	print("Burnin,")
-	print(burnin)
+#	print("the number of iterations,")
+#	print(iterations)
+#	thi = int((len(x)))*thi#100
+#	print("Thining,")
+#	print(thi)
+#	burnin=10000*len(xp) #20000
+#	print("Burnin,")
+#	print(burnin)
 	print("Total iterations,")
 	print(burnin + iterations*thi)
 
@@ -388,7 +402,7 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 	#Output=array(Output)
 	print("Acceptance rate")
 	print(k0/(i+.0))
-	print("The twalk did", k, "iterations")
+#	print("The twalk did", k, "iterations")
 
 
 	savetxt(dirt+'Results/Results_output.csv', Output,delimiter=',')
@@ -449,8 +463,8 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 
 def invlookup(date,sd,cc,ccpb,dirt):
 
-	Xlow=date-5*sd
-	Xhigh=date+5*sd
+	Xlow =date-4*sd
+	Xhigh=date+4*sd
 	if cc==1:
 		intcal = genfromtxt(dirt+'IntCal13.14C', delimiter = '\t')
 		intcal = intcal[::-1,...]
@@ -500,13 +514,16 @@ def invlookup(date,sd,cc,ccpb,dirt):
 
 
 	for i in range(len(ic2)-1):
-		if all([ic2[i,1]>Xhigh,ic2[i+1,1]<=Xhigh]):
+		if all( [ic2[i,1]>Xhigh,ic2[i+1,1]<=Xhigh]):
 			placeshigh.append(i)
 #			print("PLACESHIGH")
 		if all([ic2[i,1]>Xlow,ic2[i+1,1]<=Xlow]):
 			placeslow.append(i)
 #			print("PLACES LOW")
-	places=[ ic2[placeslow[-1],0], ic2[placeshigh[0],0] ]
+	places=[ ic2[placeslow[-1],0]-70, ic2[placeshigh[0],0] +70]
+	# print(placeslow)
+	# print(placeshigh)
+	# print(places)
 	return places
 
 
@@ -530,61 +547,57 @@ def incallookup2(i,cc,ccpb,dirt):
 	if ccpb==1:
 		intcalpost = genfromtxt(dirt+'Calibration Curves/postbomb_NH1.14C', delimiter =  "\t"  )
 		intcalpost = intcalpost[::-1,...]
-		ic2=concatenate((ic,intcalpost), axis=0)
+		ic2=concatenate((intcalpost,ic), axis=0)
 		npost=len(intcalpost[:,1])
 	if ccpb==2:
 		intcalpost = genfromtxt(dirt+'Calibration Curves/postbomb_NH2.14C', delimiter =  "\t"  )
 		intcalpost = intcalpost[::-1,...]
-		ic2=concatenate((ic,intcalpost), axis=0)
+		ic2=concatenate((intcalpost,ic), axis=0)
 		npost=len(intcalpost[:,1])
 	if ccpb==3:
 		intcalpost = genfromtxt(dirt+'Calibration Curves/postbomb_NH3.14C', delimiter =  "\t"  )
 		intcalpost = intcalpost[::-1,...]
-		ic2=concatenate((ic,intcalpost), axis=0)
+		ic2=concatenate((intcalpost,ic), axis=0)
 		npost=len(intcalpost[:,1])
 	if ccpb==4:
 		intcalpost = genfromtxt(dirt+'Calibration Curves/postbomb_SH3.14C', delimiter =  "\t"  )
 		intcalpost = intcalpost[::-1,...]
-		ic2=concatenate((ic,intcalpost), axis=0)
+		ic2=concatenate((intcalpost,ic), axis=0)
 		npost=len(intcalpost[:,1])
 	if ccpb==5:
 		intcalpost = genfromtxt(dirt+'Calibration Curves/postbomb_SH1-2.14C', delimiter =  "\t"  )
 		intcalpost = intcalpost[::-1,...]
-		ic2=concatenate((ic,intcalpost), axis=0)
+		ic2=concatenate((intcalpost,ic), axis=0)
 		npost=len(intcalpost[:,1])
-
-	if i<0:
-		down=1
-		if i > -61.2:
-			while i > ic2[down][0]:
-				down += 1
-		else:
-			down=1
-		up = down-1
-	elif i < 14000:
-		down = int(i/5.+1.)+npost
-		up = down-1
-	elif i < 25000:
-		down = (2791+int((i-14000)/10))+npost
-		up = down -1
-	elif i < 49980:
-		down = (3891+int((i-25000)/20))+npost
-		up=down -1
+	if ccpb==5:
+		pbconst=-61.2
 	else:
-		down=5789
-		up=5790
-	icdown0=ic2[down,0]
-	icdown1=ic2[down,1]
-	icdown2=ic2[down,2]
-	prop = (i - icdown0)/(ic2[up,0]-icdown0)
-	mean = prop*(ic2[up,1]-icdown1) + icdown1
-	var = prop*(ic2[up,2]-icdown2)  + icdown2
+		pbconst=-59.6
+	mean=interp(i,ic2[:,0],ic2[:,1])
+	var =interp(i,ic2[:,0],ic2[:,2])
 	result=([mean,var])
 	return result
 
+def Calibrate(date,Cdate,cc,ccpb,dirt,Tdis):
+	inc=incallookup2(date,cc,ccpb,dirt)
+	mu=inc[0]
+	sigm=(inc[1]+Cdate[1])
+	if Tdis==True:
+		u=((4. + ((Cdate[0]-mu)**2.)/((2.*sigm)) )**(-7./2.) ) * (sigm)**-.5
+	else:
+		u=exp( -((Cdate[0]-mu)**2.)/((2.*sigm)) ) * (sigm)**-.5
+	if isnan(u):
+		print(mu,sigm,inc[1])
+	return u
 
 
 
+
+
+
+#################################################################################
+#################################################################################
+#################################################################################
 
 #dirt="/home/endymion/Documents/PLUM-14C/Test1/"
 #lead="Data-14C.csv"

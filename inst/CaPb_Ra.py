@@ -1,7 +1,7 @@
 #include <Rcpp.h>
 #include <Python.h>
 	#####################  Librerias
-from numpy import isnan,savetxt,genfromtxt, array, log, unique, exp, append,concatenate,zeros, repeat,linspace,matrix
+from numpy import isnan,savetxt,genfromtxt, array, log, unique, exp, append,concatenate,zeros, repeat,linspace,matrix,isnan,interp
 import cProfile
 from scipy.stats import uniform as unif
 from matplotlib.pyplot import plot, close, show, savefig,hist, xlabel, ylabel, title,axis,subplot, figure, setp
@@ -169,29 +169,31 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,n_supp,det_lim,iteration
 	def incallookup(points):
 		result =[]
 		for i in points:
-			if i<0:
-				down=1
-				if i > -61.2:
-					while i > ic[down][0]:
-						down += 1
-				else:
-					down=1
-				up = down-1
-			elif i < 14000:
-				down = int(i/5.+1)+npost
-				up = down-1
-			elif i < 25000:
-				down = (2791+int((i-14000.)/10))+npost
-				up = down -1
-			else:
-				down = +(3891+int((i-25000)/20)) +npost
-				up=down -1
-			icdown0=ic[down,0]  #CalBp
-			icdown1=ic[down,1]  #CalRC
-			icdown2=ic[down,2]  #SD
-			prop = (i - icdown0)/(ic[up,0]-icdown0)
-			mean = prop*(ic[up,1]-icdown1)+icdown1
-			var = prop*(ic[up,2]-icdown2)+icdown2
+#			if i<0:
+#				down=1
+#				if i > -61.2:
+#					while i > ic[down][0]:
+#						down += 1
+#				else:
+#					down=1
+#				up = down-1
+#			elif i < 14000:
+#				down = int(i/5.+1)+npost
+#				up = down-1
+#			elif i < 25000:
+#				down = (2791+int((i-14000.)/10))+npost
+#				up = down -1
+#			else:
+#				down = +(3891+int((i-25000)/20)) +npost
+#				up=down -1
+#			icdown0=ic[down,0]  #CalBp
+#			icdown1=ic[down,1]  #CalRC
+#			icdown2=ic[down,2]  #SD
+#			prop = (i - icdown0)/(ic[up,0]-icdown0)
+#			mean = prop*(ic[up,1]-icdown1)+icdown1
+#			var = prop*(ic[up,2]-icdown2)+icdown2
+			mean=interp(i,ic[:,0],ic[:,1])
+			var =interp(i,ic[:,0],ic[:,2])
 			result.append ([mean,var])
 		return result
 
@@ -332,14 +334,14 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,n_supp,det_lim,iteration
 
 
 	################## New MCMC test
-	print("the number of itrations,")
-	print(iterations)
+#	print("the number of itrations,")
+#	print(iterations)
 	thi = int((len(x)))*thi #100
-	print("Thining,")
-	print(thi)
+#	print("Thining,")
+#	print(thi)
 	burnin=burnin*len(xp) #20000
-	print("Burnin,")
-	print(burnin)
+#	print("Burnin,")
+#	print(burnin)
 	print("Total iterations,")
 	print(burnin + iterations*thi)
 
@@ -382,7 +384,7 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,n_supp,det_lim,iteration
 	#Output=array(Output)
 	print("Acceptance rate")
 	print(k0/(i+.0))
-	print("The twalk did", k, "iterations")
+#	print("The twalk did", k, "iterations")
 
 
 	savetxt(dirt+'Results/Results_output.csv', Output,delimiter=',')

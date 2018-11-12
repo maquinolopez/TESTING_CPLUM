@@ -115,7 +115,7 @@ for (i in 1:length(Lead[,1])){
 
 
 for (i in 1:length(Carbon[,1])){
-  plot14C(cdate = as.numeric(Carbon[i,]),cc = cc,ccpb = ccpb,S_year = Sample_year,w = .5)
+  plot14C(cdate = as.numeric(Carbon[i,]),cc = cc,ccpb = ccpb,S_year = Sample_year,w = w)
 }
 
 
@@ -183,25 +183,39 @@ ageof=function(x,interval=.95,folder,Data){
 }
 
 
+require(CPlum)
 plot14C <- function(cdate,cc,ccpb,S_year,w=.8){
-  print(cdate)
+  print(paste("Plotting",cdate[1],"at depth",cdate[3]) )
   library(rPython)
   modirec=path.package("CPlum", quiet = T)
   ccdir=paste(modirec,"/Calibration Curves/",sep="")
   python.load(paste(modirec,"/","CaPb.py",sep="") )
-  Xs=python.call( "invlookup",cdate[1],cdate[2],cc,ccpb,ccdir)
+  Xs=c(0,0)
+  if(cdate[1]<=0){
+    if(ccpb!=5){postlim=-59.62}else{postlim=-61.19}
+    Xs[1]=postlim
+    Xs[2]=-.01
+  }else{Xs=python.call( "invlookup",cdate[1],cdate[2],cc,ccpb,ccdir)
+  Xs[1]=0.01
+  }
+  
   Xs=seq(Xs[1],Xs[2],length.out = 150)
   Ys=c()
   for (ic in Xs){
-    Ys=c(Ys,Calibrate(ic,cdate[-3],cc,ccpb))
+    Ys=c(Ys,python.call( "Calibrate",ic,cdate,cc,ccpb,paste0(modirec,"/"),TRUE) )
+    #Calibrate(ic,cdate[-3],cc,ccpb))
   }
-  Ys=(Ys/max(Ys))*w
-  S_year=1950-S_year
-
-
-  polygon((cdate[3]+ Ys-Ys[1]),Xs,  col = rgb(0,0,1,.5), lty = 2, lwd = 2,border=FALSE)
-  polygon((cdate[3]-Ys+Ys[1]),Xs ,  col = rgb(0,0,1,.5), lty = 2, lwd = 2,border=FALSE)
-
+  Ys=Ys-(min(Ys))
+  Ys=(Ys/max(Ys)+.001)*w
+  
+  #S_year=1950-S_year
+  
+  Ys0=((cdate[3]- Ys))
+  Ys1=((cdate[3]+ Ys))
+  
+  polygon(x=c(Ys0,rev(Ys1)),c(Xs,rev(Xs)),  col = rgb(0,0,1,.5), lty = 2, lwd = 2,border=FALSE)
+  #polygon((cdate[3]-Ys+Ys[1]),Xs ,  col = rgb(0,0,1,.5), lty = 2, lwd = 2,border=FALSE)
+ # return(Ys0)
 }
 
 
