@@ -31,7 +31,7 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,n_supp,det_lim,iteration
 
 	##################### Data definition 210Pb
 
-	density=Data[:,1]	* 10.
+	density=Data[:,1]* 10.
 	activity=Data[:,2]
 	sd_act=Data[:,3]
 	thic=Data[:,4]
@@ -169,31 +169,31 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,n_supp,det_lim,iteration
 	def incallookup(points):
 		result =[]
 		for i in points:
-#			if i<0:
-#				down=1
-#				if i > -61.2:
-#					while i > ic[down][0]:
-#						down += 1
-#				else:
-#					down=1
-#				up = down-1
-#			elif i < 14000:
-#				down = int(i/5.+1)+npost
-#				up = down-1
-#			elif i < 25000:
-#				down = (2791+int((i-14000.)/10))+npost
-#				up = down -1
-#			else:
-#				down = +(3891+int((i-25000)/20)) +npost
-#				up=down -1
-#			icdown0=ic[down,0]  #CalBp
-#			icdown1=ic[down,1]  #CalRC
-#			icdown2=ic[down,2]  #SD
-#			prop = (i - icdown0)/(ic[up,0]-icdown0)
-#			mean = prop*(ic[up,1]-icdown1)+icdown1
-#			var = prop*(ic[up,2]-icdown2)+icdown2
-			mean=interp(i,ic[:,0],ic[:,1])
-			var =interp(i,ic[:,0],ic[:,2])
+			if i<0:
+				down=1
+				if i > -61.2:
+					while i > ic[down][0]:
+						down += 1
+				else:
+					down=1
+				up = down-1
+			elif i < 14000:
+				down = int(i/5.+1)+npost
+				up = down-1
+			elif i < 25000:
+				down = (2791+int((i-14000.)/10))+npost
+				up = down -1
+			else:
+				down = +(3891+int((i-25000)/20)) +npost
+				up=down -1
+			icdown0=ic[down,0]  #CalBp
+			icdown1=ic[down,1]  #CalRC
+			icdown2=ic[down,2]  #SD
+			prop = (i - icdown0)/(ic[up,0]-icdown0)
+			mean = prop*(ic[up,1]-icdown1)+icdown1
+			var = prop*(ic[up,2]-icdown2)+icdown2
+#			mean=interp(i,ic[:,0],ic[:,1])
+#			var =interp(i,ic[:,0],ic[:,2])
 			result.append ([mean,var])
 		return result
 
@@ -444,8 +444,6 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,n_supp,det_lim,iteration
 
 
 def invlookup(date,sd,cc,ccpb,dirt):
-
-
 	Xlow=date-5*sd
 	Xhigh=date+5*sd
 	if cc==1:
@@ -486,12 +484,8 @@ def invlookup(date,sd,cc,ccpb,dirt):
 		intcalpost = genfromtxt(dirt+'postbomb_SH1-2.14C', delimiter =  "\t"  )
 		#intcalpost = intcalpost[::-1,...]
 		ic2=concatenate((ic,intcalpost), axis=0)
-
-
-
 	placeslow=[]
 	placeshigh=[]
-
 	for i in range(len(ic2)-1):
 		if all([ic2[i,1]>Xhigh,ic2[i+1,1]<=Xhigh]):
 			placeshigh.append(i)

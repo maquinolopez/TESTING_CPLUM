@@ -59,13 +59,13 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 		print("IntCal13 will be used")
 	if cc==2:
 		intcal = genfromtxt(Dircc+'Marine13.14C', delimiter = '\t')
-	#intcal = intcal[::-1,...]
+		#intcal = intcal[::-1,...]
 		ic = intcal[:,0:3]
 		print("Marine13 will be used")
 	if cc==3:
 		intcal = genfromtxt(Dircc+'SHCal13.14C', delimiter = ',')
 		#intcal = intcal[::-1,...]
-		ic = intcal#[:,0:3]
+		ic = intcal[:,0:3]
 		print("SHCal13 will be used")
 	if ccpb==0:
 		npost=0
@@ -91,12 +91,12 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 		ic=concatenate((intcalpost,ic), axis=0)
 		npost=len(intcalpost[:,1])
 	##################### Depths calculation
-	#print(data)
+	print(ic[:,:])
 	#print(npost)
 
 
-	hard_lim=invlookup(max(data[:,0]),max(data[:,1]),cc,ccpb,Dircc)[-1]+150
-	#print("HERE")
+	hard_lim=invlookup(max(data[:,0]),max(data[:,1]),cc,ccpb,Dircc)[-1]#+150
+	print(hard_lim)
 
 
 
@@ -110,7 +110,7 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 
 	m_last_Pb=0
 	while  breaks[m_last_Pb]< depth[-1]:
-			   m_last_Pb += 1
+		m_last_Pb += 1
 
 	dep_time_data=append(depth-thic,depth)
 	dep_time_data=list(set(dep_time_data))
@@ -129,13 +129,13 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 		tmp3=True
 		for i in param:
 			 if i <= 0.:
-			   tmp3=False
+				tmp3=False
 		if param[2]>=1.:
-		   tmp3=False
+			tmp3=False
 		if times([depth[-1]],param)[-1]>last_t(param[0]):
-		   tmp3=False
+			tmp3=False
 		if times([breaks[-1]],param)>hard_lim:
-		   tmp3=False
+			tmp3=False
 		return tmp3
 
 	def last_t(fi):
@@ -148,17 +148,16 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 		t1=m-1
 		ms1=array([a[m-1]])
 		while t1 >0 :
-		   ms1= append(ms1, w*ms1[-1]+(1-w)*a[t1-1])
-		   t1 -= 1
-
+			ms1= append(ms1, w*ms1[-1]+(1-w)*a[t1-1])
+			t1 -= 1
 		ms=ms1[::-1]
 		ages=array([])
 		y_last=append([0],array([sum(ms[:i+1]*by) for i in range(len(ms))] ) )
 		for i in range(len(x)):
-		   k1=0
-		   while  breaks[k1]< x[i]:
-			   k1 += 1
-		   ages=append(ages,y_last[k1]+(ms[k1]*(by-(breaks[k1]-x[i]))))
+			k1=0
+			while  breaks[k1]< x[i]:
+				k1 += 1
+			ages=append(ages,y_last[k1]+(ms[k1]*(by-(breaks[k1]-x[i]))))
 		return ages
 
 	def pendi(param):
@@ -175,44 +174,44 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 	def incallookup(points):
 		result =[]
 		for i in points:
-#		   if i<0:
-#			   up=1
-#			   if i > -61.2:
-#				   while i > ic[up][0]:
-#					   up += 1
-#			   else:
-#				   up=1
-#			   down = up-1
-#		   elif i < 14000:
-#			   down = int(i/5.+1)+npost
-#			   up = down-1
-#		   elif i < 25000:
-#			   down = (2791+int((i-14000.)/10))+npost
-#			   up = down -1
-#		   else:
-#			   down = +(3891+int((i-25000)/20)) +npost
-#			   up=down -1
-		   mean=interp(i,ic[:,0],ic[:,1])
-		   var =interp(i,ic[:,0],ic[:,2])
-#		   icdownx=ic2[up,0]
-#		   icdowny=ic2[up,1]
-#		   icdowny2=ic2[up,2]
-#		   icupx=ic2[down,0]
-#		   icupy=ic2[down,1]
-#		   icupy2=ic2[down,2]
-#		   prop =  (icupy -icdowny )/(icupx-icdownx)*i     #(i - icdown0)/(ic2[up,0]-icdown0)
-#		   prop2 = (icupy2-icdowny2)/(icupx-icdownx)*i
-#		   prop =  ((icupy -icdowny )/(icupx-icdownx))     #(i - icdown0)/(ic2[up,0]-icdown0)
-#		   prop2 = ((icupy2-icdowny2)/(icupx-icdownx))
-#		   mean = prop*(i-icdownx) + icdowny
-#		   var = prop**(i-icdownx)  + icdowny2
-#		   icdown0=ic[down,0]  #CalBp
-#		   icdown1=ic[down,1]  #CalRC
-#		   icdown2=ic[down,2]  #SD
-#		   prop = (i - icdown0)/(ic[up,0]-icdown0)
-#		   mean = prop*(ic[up,1]-icdown1)+icdown1
-#		   var = prop*(ic[up,2]-icdown2)+icdown2
-		   result.append ([mean,var])
+#			if i<0:
+#				up=1
+#				if i > -61.2:
+#					while i > ic[up][0]:
+#						up += 1
+#				else:
+#					up=1
+#				down = up-1
+#			elif i < 14000:
+#				down = int(i/5.+1)+npost
+#				up = down-1
+#			elif i < 25000:
+#				down = (2791+int((i-14000.)/10))+npost
+#				up = down -1
+#			else:
+#				down = +(3891+int((i-25000)/20)) +npost
+#				up=down -1
+#			icdownx=ic[up,0]
+#			icdowny=ic[up,1]
+#			icdowny2=ic[up,2]
+#			icupx=ic[down,0]
+#			icupy=ic[down,1]
+#			icupy2=ic[down,2]
+#			prop =  (icupy -icdowny )/(icupx-icdownx)*i     #(i - icdown0)/(ic2[up,0]-icdown0)
+#			prop2 = (icupy2-icdowny2)/(icupx-icdownx)*i
+#			prop =  ((icupy -icdowny )/(icupx-icdownx))     #(i - icdown0)/(ic2[up,0]-icdown0)
+#			prop2 = ((icupy2-icdowny2)/(icupx-icdownx))
+#			mean = prop*(i-icdownx) + icdowny
+#			var = prop**(i-icdownx)  + icdowny2
+#			icdown0=ic[down,0]  #CalBp
+#			icdown1=ic[down,1]  #CalRC
+#			icdown2=ic[down,2]  #SD
+#			prop = (i - icdown0)/(ic[up,0]-icdown0)
+#			mean = prop*(ic[up,1]-icdown1)+icdown1
+#			var = prop*(ic[up,2]-icdown2)+icdown2
+			mean=interp(i,ic[:,0],ic[:,1])
+			var =interp(i,ic[:,0],ic[:,2])
+			result.append ([mean,var])
 		return result
 
 #######lead likelihood
@@ -243,7 +242,7 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 	def ln_like_supp(param):
 		logsupp=0.
 		for i in range(len(supp)):
-		   logsupp = logsupp + ((param[1]-supp[i])**2.)/(2.*(sd_supp[i])**2.)
+			logsupp = logsupp + ((param[1]-supp[i])**2.)/(2.*(sd_supp[i])**2.)
 		return logsupp
 
 
@@ -267,10 +266,10 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 		dat=times(data[:,2],param) + Sample_year
 		inc=incallookup(dat)
 		for i in range(len(inc)):
-		   mu=inc[i][0]
-		   sigm=(inc[i][1]**2+data[i][1]**2)
-		   u=u+(7./2.)*log(4. + ((data[i,0]-mu)**2.)/((2.*sigm)) ) + .5*log(sigm)
-		   #log(lamda/alpha1)/2-((alpha1+1)/2)*log(1+(lamda/alpha1)*(data[i,0]-mu)**2)
+			mu=inc[i][0]
+			sigm=inc[i][1]**2+data[i][1]**2
+			ut=(7./2.)*log(4. + ((data[i,0]-mu)**2.)/(2.*sigm) ) + .5*log(sigm)
+			u=u+ut
 		return u
 
 	def UxN(param):
@@ -278,10 +277,9 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 		dat=times(data[:,2],param) + Sample_year
 		inc=incallookup(dat)
 		for i in range(len(inc)):
-		   mu=inc[i][0]
-		   sigm=(inc[i][1]**2+data[i][1]**2)
-		   u=u+( ((data[i,0]-mu)**2.)/((2.*sigm)) ) + .5*log(sigm)
-		   #log(lamda/alpha1)/2-((alpha1+1)/2)*log(1+(lamda/alpha1)*(data[i,0]-mu)**2)
+			mu=inc[i][0]
+			sigm=(inc[i][1]**2+data[i][1]**2)
+			u=u+( ((data[i,0]-mu)**2.)/((2.*sigm)) ) + .5*log(sigm)
 		return u
 
 	if T_mod_C:
@@ -291,38 +289,38 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 
 
 	def obj(param):
-		objval= ln_like_supp(param) + ln_prior_supp(param) + log_dataC(param)  + log_data(param)
+		objval= log_dataC(param) + ln_like_supp(param) + ln_prior_supp(param)  + log_data(param)
 		return objval
 
 	def Calib(numfi,maxe):
 		figure(numfi)
 		for c in data:
-		   fecha=c[:2]
-		   if fecha[0]<=0.:
-			x=linspace(Sample_year,200,1500)
-		   else:
-			lowa=max((fecha[0]-400.),Sample_year)
-			x=linspace(lowa,maxe,2500)
-		   u , newx=[], []
-		   dat=array(x)
-		   inc=incallookup(dat)
-		   for i in range(len(inc)):
-			   mu=inc[i][0]
-			   sigm=(inc[i][1]**2 + fecha[1]**2)
-			   utest=((4. + ((fecha[0]-mu)**2.)/((2.*sigm)) )**(-7./2)  )
-			   u.append([utest]  )
-		   u=array(u)
-		   maxu=max(u)
-		   u=(u/maxu)
-		   y=[]
-		   for i in range(len(u)):
-			   if u[i]>.08:
-				   y.append(u[i])
-				   newx.append([x[i]])
-		   y=array(y)*5.
-		   newx=array(newx)- Sample_year
-		   plot((-y+c[2]),newx,color="blue",alpha=.6)
-		   plot( (y+c[2]),newx,color="blue", alpha=.6)
+			fecha=c[:2]
+			if fecha[0]<=0.:
+				x=linspace(Sample_year,200,1500)
+			else:
+				lowa=max((fecha[0]-400.),Sample_year)
+				x=linspace(lowa,maxe,2500)
+				u , newx=[], []
+				dat=array(x)
+				inc=incallookup(dat)
+			for i in range(len(inc)):
+				mu=inc[i][0]
+				sigm=(inc[i][1]**2 + fecha[1]**2)
+				utest=((4. + ((fecha[0]-mu)**2.)/((2.*sigm)) )**(-7./2)  )
+				u.append([utest]  )
+			u=array(u)
+			maxu=max(u)
+			u=(u/maxu)
+			y=[]
+			for i in range(len(u)):
+				if u[i]>.08:
+					y.append(u[i])
+					newx.append([x[i]])
+			y=array(y)*5.
+			newx=array(newx)- Sample_year
+			plot((-y+c[2]),newx,color="blue",alpha=.6)
+			plot( (y+c[2]),newx,color="blue", alpha=.6)
 
 	#################### Initial valules
 	print("Seaching initial values")
@@ -354,10 +352,10 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 	################## New MCMC test
 #	print("the number of iterations,")
 #	print(iterations)
-#	thi = int((len(x)))*thi#100
+	thi = int((len(x)))*thi#100
 #	print("Thining,")
 #	print(thi)
-#	burnin=10000*len(xp) #20000
+	burnin=burnin*len(xp) #20000
 #	print("Burnin,")
 #	print(burnin)
 	print("Total iterations,")
@@ -386,7 +384,7 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 				Output[i+1,n] = U
 				if any([i % por==0, i==0]) :
 					print int(100*(i+.0)/iterations),"%"
-				   #print((time.clock()-tiempomedir)/60)
+					#print((time.clock()-tiempomedir)/60)
 				i+= 1
 		else:
 			if all([k % thi ==0 , k>int(burnin)]):
@@ -394,7 +392,7 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 				Output[i+1,n] = U
 				if any([i % por==0, i==0]) :
 					print int(100*(i+.0)/iterations),"% Done"
-				   #print((time.clock()-tiempomedir)/60)
+					#print((time.clock()-tiempomedir)/60)
 				i+= 1
 
 
@@ -463,8 +461,8 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 
 def invlookup(date,sd,cc,ccpb,dirt):
 
-	Xlow =date-4*sd
-	Xhigh=date+4*sd
+	Xlow =date-5*sd
+	Xhigh=date+5*sd
 	if cc==1:
 		intcal = genfromtxt(dirt+'IntCal13.14C', delimiter = '\t')
 		intcal = intcal[::-1,...]
@@ -504,7 +502,7 @@ def invlookup(date,sd,cc,ccpb,dirt):
 	if ccpb==5:
 		intcalpost = genfromtxt(dirt+'postbomb_SH1-2.14C', delimiter =  "\t"  )
 		#intcalpost = intcalpost[::-1,...]
-		ic2=concatenate((ic,intcalpost), axis=0)
+		ic2=concatenate((intcalpost,ic), axis=0)
 
 
 
@@ -581,7 +579,7 @@ def incallookup2(i,cc,ccpb,dirt):
 def Calibrate(date,Cdate,cc,ccpb,dirt,Tdis):
 	inc=incallookup2(date,cc,ccpb,dirt)
 	mu=inc[0]
-	sigm=(inc[1]+Cdate[1])
+	sigm=(inc[1]**2+Cdate[1]**2)
 	if Tdis==True:
 		u=((4. + ((Cdate[0]-mu)**2.)/((2.*sigm)) )**(-7./2.) ) * (sigm)**-.5
 	else:
@@ -644,9 +642,9 @@ def Calibrate(date,Cdate,cc,ccpb,dirt,Tdis):
 ########################################################
 ###  This is the python implementation of the t-walk ### 
 ###  By Andres Christen.							 ###
-###  A generic self adjusting MCMC				   ###
-###  see:  http://www.cimat.mx/~jac/twalk/		   ###
-###  see also twalktutorial.py					   ###
+###  A generic self adjusting MCMC					###
+###  see:  http://www.cimat.mx/~jac/twalk/			###
+###  see also twalktutorial.py						###
 ########################################################
 
 

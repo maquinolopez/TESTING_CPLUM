@@ -2,7 +2,7 @@
 
 fullchronologyC= function(folder,DataP,DataC,resolution=200,supp_type=1,Sample_year=2017,cc=1,ccpb=0,
                          memory_shape=4., memory_mean=.7,acc_shape=1.5,acc_mean=20,
-                         fi_mean=50,fi_acc=2,As_mean=20,As_acc=2,w_plot=.8){
+                         fi_mean=50,fi_acc=2,As_mean=20,As_acc=2,w_plot=.8,main1 =""){
   par(mfrow=c(1,1))
   Ages=read.table(paste(folder,"Results/dates.csv",sep=""),sep=" ")
   Ages=Ages+1950-Sample_year
@@ -68,7 +68,7 @@ fullchronologyC= function(folder,DataP,DataC,resolution=200,supp_type=1,Sample_y
   polygon(d, col=gray(.6))
   lines(seq(0,350,.05),dgamma(seq(0,350,.05),fi_acc,scale=fi_mean/fi_acc),col="green")
 
-  chronologylinesC(folder,DataP,DataC,Sample_year,cc,ccpb,w = w_plot)
+  chronologylinesC(folder,DataP,DataC,Sample_year,cc,ccpb,w = w_plot,main1 = main1)
 
 
   par(mfrow=c(1,1))
@@ -205,8 +205,8 @@ plot14C <- function(cdate,cc,ccpb,S_year,w=.8){
     Ys=c(Ys,python.call( "Calibrate",ic,cdate,cc,ccpb,paste0(modirec,"/"),TRUE) )
     #Calibrate(ic,cdate[-3],cc,ccpb))
   }
-  Ys=Ys-(min(Ys))
-  Ys=(Ys/max(Ys)+.001)*w
+#  Ys=Ys#-(min(Ys))
+  Ys=(Ys/max(Ys))*w
   
   #S_year=1950-S_year
   
