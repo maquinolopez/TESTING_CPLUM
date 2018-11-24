@@ -12,7 +12,7 @@
 #' @export
 
 runCPlum=function(folder,DataPb,DataC,iterations=2e+3,by=5.0,number_supported=FALSE,detection_limit=.05,
-                memory_shape=4., memory_mean=.4,fi_mean=50,fi_acc=2,
+                memory_shape=4., memory_mean=.4,fi_mean=50,fi_acc=2,filediv=1,
                 As_mean=20,As_acc=2,resolution=200,burnin=1000,thi=10,
                  acc_shape=1.5,acc_mean=20,cc=1,ccpb=0,Sample_year=2017,seeds=12345678){
   library(rPython)
@@ -112,46 +112,6 @@ deptsSeq=deptsSeq
 diffSep=(deptsSeq[2]-deptsSeq[1])/2
 TotSeq=length(Ages[,1])
 
-# pdf(paste(folder,'Chronologynew.pdf',sep=""))
-# plot(-6,-6, xlim=c(0,Depths[length(Depths)]),ylim = c(0, maxA),xlab = "Depth (cm)",ylab="Age (years)" )
-#
-# for (i2 in 1:(resolution-1)){
-#     for (i in 1:(resolution-1) ){
-#       rect(deptsSeq[i2], ageSeq[i], deptsSeq[i2+1], ageSeq[i+1], density = NA, border = NA,
-#       col = gray((1-Plotval[i2,i])))
-#     }
-# }
-# lines(Depths,c(0,intervals[,2]),type="l", lty=2, lwd=1)
-# lines(Depths,(c(0,intervals[,4])),type="l", lty=2, lwd=1)
-# lines(Depths,(c(0,intervals[,3])),type="l", lty=2, lwd=1)
-# dev.off()
-#
-#
-# pdf(paste(folder,'Slopes.pdf',sep=""))
-# maxS=max(Slopes)+.10
-# plot(-10,-10, xlim=c(0,Depths[length(Depths)]),ylim = c(0, maxS),xlab = "Depth (cm)",ylab="Slopes (Accumulations)" )
-# for (i in 1:(iterations-1)){
-#   lines(Depths,as.numeric(c(0,Slopes[i,])),type="l",col=rgb(0,0,0,.01), lwd=2)
-# }
-# dev.off()
-#
-#
-#
-#
-#
-#
-# pdf(paste(folder,'Chronology.pdf',sep=""))
-# plot(Depths,c(0,Ages[2,]),type="l",col=rgb(0,0,0,.01), lwd=2,ylim = c(0,max(Ages[,length(Ages[1,])])),xlab = "Depth (cm)",ylab="Age (years)")
-# for (i in 1:(iterations-1)){
-#   lines(Depths,c(0,Ages[i,]),type="l",col=rgb(0,0,0,.01), lwd=2)
-# }
-# lines(Depths,c(0,intervals[,2]),type="l", lty=2, lwd=1)
-# lines(Depths,(c(0,intervals[,4])),type="l", lty=2, lwd=1)
-# lines(Depths,(c(0,intervals[,3])),type="l", lty=2, lwd=1)
-# dev.off()
-#
-#
-#
 
 pdf(paste(folder,'Fi.pdf',sep=""))
 plot(as.numeric(Output[-1,1]),type="l",main="fi",xlab="",ylab="")
@@ -200,6 +160,11 @@ par(mfrow=c(1,1))
 fullchronologyC(folder,DataPb,DataC,Sample_year = Sample_year,cc = cc,ccpb = ccpb,
                memory_shape=memory_shape,memory_mean=memory_mean,acc_mean=acc_mean,
                acc_shape=acc_shape,supp_type = usemod)
+
+
+intervalfile=by_cm(folder,filediv)
+write.csv(x = intervalfile,file = paste0(folder,"ages.csv"))
+
 
 }
 
@@ -270,6 +235,15 @@ Calibrate =function(x,cdate,cc,ccpb){
 
 
 
-
-
-
+#' @export
+by_cm=function(folder,filediv){
+  intv=read.table(paste(folder,"Results/intervals.csv",sep=""),sep=",")
+  dpts= seq(filediv,max(intv[,1]),by=filediv)
+  agedmodl=approx(c(0,intv[,1]),c(0,intv[,2]),dpts)$y
+  agedmodm=approx(c(0,intv[,1]),c(0,intv[,3]),dpts)$y
+  agedmodu=approx(c(0,intv[,1]),c(0,intv[,4]),dpts)$y
+  Age_max=matrix(c(c(1:max(intv[,1])),agedmodl,agedmodm,agedmodu),ncol = 4,byrow=F)
+  colnames(Age_max) <- c("depth","min","mean","max")
+  return(Age_max)
+}
+  

@@ -134,8 +134,8 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 			tmp3=False
 		if times([depth[-1]],param)[-1]>last_t(param[0]):
 			tmp3=False
-		if times([breaks[-1]],param)>hard_lim:
-			tmp3=False
+#		if times([breaks[-1]],param)>hard_lim:
+#			tmp3=False
 		return tmp3
 
 	def last_t(fi):
