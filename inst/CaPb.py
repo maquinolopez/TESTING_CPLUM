@@ -326,12 +326,12 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 	print("Seaching initial values")
 	fi_ini_1= unif.rvs(size=1,loc=50, scale=200)  #200.
 	fi_ini_2= unif.rvs(size=1,loc=250, scale=150) #100.
-	supp_ini_1= unif.rvs(size=1,loc=15, scale=30) #5.
-	supp_ini_2= unif.rvs(size=1,loc=1, scale=15) #20.
+	supp_ini_1= unif.rvs(size=1,loc=As_mean, scale=3) #5.
+	supp_ini_2= unif.rvs(size=1,loc=As_mean, scale=1) #20.
 	w_ini = unif.rvs(size=1,loc=.2,scale=.3) #.3
 	w_ini0 = unif.rvs(size=1,loc=.3,scale=.3)  #.7
-	m_ini_1=unif.rvs(size=m,loc=0, scale=15)  #  repeat(array(3.1),m,axis=0)
-	m_ini_2=unif.rvs(size=m,loc=0, scale=15)  # repeat(array(.5),m,axis=0)
+	m_ini_1=unif.rvs(size=m,loc=0, scale=mean_acc)  #  repeat(array(3.1),m,axis=0)
+	m_ini_2=unif.rvs(size=m,loc=0, scale=2*mean_acc)  # repeat(array(.5),m,axis=0)
 
 	x=append(append(append(fi_ini_1,supp_ini_1),w_ini), m_ini_1)
 	xp=append(append(append(fi_ini_2,supp_ini_2),w_ini0), m_ini_2)

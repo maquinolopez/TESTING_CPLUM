@@ -43,7 +43,7 @@ fullchronologyC= function(folder,DataP,DataC,resolution=200,supp_type=1,Sample_y
   lines(seq(0,1,.01),dbeta(seq(0,1,.01),memory_shape,memory_shape2),col="green")
 
   d <- density(as.numeric(unlist(Output[-1,-c(c(1:(Ran+2)),num_var)])))
-  plot(d,xlab="",main="Acc",ylab = "",xlim=c(0,80),xaxs="i",yaxs="i")
+  plot(d,xlab="",main="Acc",ylab = "",xaxs="i",yaxs="i")
   polygon(d, col=gray(.6))
   lines(seq(0,100,.5),dgamma(seq(0,100,.5),shape=acc_shape,scale=acc_mean/acc_shape),col="green")
 
