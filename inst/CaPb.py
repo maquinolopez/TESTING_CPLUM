@@ -362,7 +362,7 @@ def runmod(dirt,plomo,carbon,Dircc,T_mod,T_mod_C,S_year,num_sup,det_lim,iteratio
 	print(burnin + iterations*thi)
 
 
-	leadchrono = pytwalk(n=len(x),U=obj,Supp=support)
+	leadchrono = pytwalk(n=len(x),U=obj,Supp=support, ww=[ 0.0, 0.4918, 0.4918, 0.0082+0.082, 0.0])
 	i, k ,k0, n=0 , 0, 0, len(x)
 	U , Up = obj(x), obj(xp)
 	por=int(iterations/10.)
