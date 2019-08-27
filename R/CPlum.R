@@ -13,7 +13,7 @@
 
 runCPlum=function(folder,DataPb,DataC,iterations=2e+3,by=5.0,number_supported=FALSE,detection_limit=.05,
                 memory_shape=4., memory_mean=.4,fi_mean=50,fi_acc=2,filediv=1,
-                As_mean=20,As_acc=2,resolution=200,burnin=1000,thi=10,
+                As_mean=20,As_acc=2,resolution=200,burnin=1000,thi=10,Ratype=F,
                  acc_shape=1.5,acc_mean=20,cc=1,ccpb=0,Sample_year=2017,seeds=12345678){
   library(rPython)
   folder=paste(normalizePath(folder),"/",sep="")
@@ -31,42 +31,53 @@ runCPlum=function(folder,DataPb,DataC,iterations=2e+3,by=5.0,number_supported=FA
   
   
   
-  
-  if(number_supported==FALSE){
-  if(length(Lead[1,])==5){
-    n.check=check.equi(Lead)
-    print(n.check[1])
-    usrresp=1
-    while(!(usrresp=="Yes"||usrresp=="No"||usrresp=="no"||usrresp=="yes")){
-      cat("Are you sure these data represent the supported 210Pb for this site?")
-      usrresp=readline( "Yes or No \n ")
-      if(usrresp=="Yes"||usrresp=="No"||usrresp=="no"||usrresp=="yes"){
-        if(usrresp=="Yes"||usrresp=="yes"){
-          number_supported=n.check[1]}
-        if(usrresp=="No"||usrresp=="no"){
-          checksupp="notoy"
-          while(typeof(checksupp)!="double"){
-            cat("Please indicate how many data points whould be use for estimating the supported 210Pb")
-            number_supported=scan("",n=1)
+  if(Ratype==F){
+    if(number_supported==FALSE){
+      if(length(Lead[1,])==5){
+        n.check=check.equi(Lead)
+        print(n.check[1])
+        usrresp=1
+        while(!(usrresp=="Yes"||usrresp=="No"||usrresp=="no"||usrresp=="yes")){
+          cat("Are you sure these data represent the supported 210Pb for this site?")
+          usrresp=readline( "Yes or No \n ")
+          if(usrresp=="Yes"||usrresp=="No"||usrresp=="no"||usrresp=="yes"){
+            if(usrresp=="Yes"||usrresp=="yes"){
+              number_supported=n.check[1]}
+            if(usrresp=="No"||usrresp=="no"){
+              checksupp="notoy"
+              while(typeof(checksupp)!="double"){
+                cat("Please indicate how many data points whould be use for estimating the supported 210Pb")
+                number_supported=scan("",n=1)
+                }
             }
+          }
         }
+        usemod=1
+      }else if(length(Lead[1,])==7){
+        cat("You have 226Ra data. \n")
+        plot(Lead[,1],Lead[,6],pch=16,ylim=c(min(Lead[,6]-Lead[,7]),max(Lead[,6]+Lead[,7])), ylab="Concentration of 226Ra", xlab="Depth (cm)")
+        segments(Lead[,1], Lead[,6]-Lead[,7], x1 = Lead[,1], y1 = Lead[,6]+Lead[,7])
+        cat("Plum can assum to have a constant supported 210Pb and use the 226Ra data to infer this one value\n")
+        cat("Plum can also assum individual supporeted 210Pb per data point.\n
+            It is important to consider that this will greatly increses the computing time and it should only be use when clear parters are observed in the 226Ra data.\n")
+        cat("\n If you want to use the constant supported 210Pb press 1, if you want to use the individual 210Pb press 2\n")
+        usemod=0
+        while(!(usemod==1||usemod==2)){
+          usemod=scan("",n=1)
+        }
+        }
+    }else{usemod=1}
+  }else {if (Ratype==2){
+    usemod=2
+  }
+    if(Ratype==1){
+      usemo=1
+      if(number_supported==FALSE){
+        cat("Please indicate how many data points whould be use for estimating the supported 210Pb")
+        number_supported=scan("",n=1)
       }
     }
-    usemod=1
-  }else if(length(Lead[1,])==7){
-    cat("You have 226Ra data. \n")
-    plot(Lead[,1],Lead[,6],pch=16,ylim=c(min(Lead[,6]-Lead[,7]),max(Lead[,6]+Lead[,7])), ylab="Concentration of 226Ra", xlab="Depth (cm)")
-    segments(Lead[,1], Lead[,6]-Lead[,7], x1 = Lead[,1], y1 = Lead[,6]+Lead[,7])
-    cat("Plum can assum to have a constant supported 210Pb and use the 226Ra data to infer this one value\n")
-    cat("Plum can also assum individual supporeted 210Pb per data point.\n
-        It is important to consider that this will greatly increses the computing time and it should only be use when clear parters are observed in the 226Ra data.\n")
-    cat("\n If you want to use the constant supported 210Pb press 1, if you want to use the individual 210Pb press 2\n")
-    usemod=0
-    while(!(usemod==1||usemod==2)){
-      usemod=scan("",n=1)
     }
-    }
-}else{usemod=1}
 
 
 
