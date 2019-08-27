@@ -18,10 +18,11 @@ IntCal13 #cc1
 Marine13 #cc2
 SHCal13 #cc3
 ConstCal #cc4
-cm #unit
+cm #depth.unit
 0 #normal
 3 #t.a
 4 #t.b
 0 #delta.R
 0 #d.STD
 0.95 #prob
+yr#age.unit
