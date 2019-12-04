@@ -3,16 +3,38 @@
 from time import time, localtime, strftime
 from numpy import floor, exp, log, sum, pi, savetxt, loadtxt, ones, zeros, cumsum, shape, mat, cov, mean, ceil, matrix, sqrt, isnan, genfromtxt, array, append, concatenate, linspace, interp, delete
 from numpy.random import uniform, normal, seed
+from os.path import expanduser, isfile
 #import cProfile
 from scipy.stats import uniform as unif
 
-def runmod(dirt, plomo, carbon, Dircc, T_mod, T_mod_C, S_year, n_supp, det_lim, iterations, by, shape1_m, mean_m, shape_acc, mean_acc, fi_mean, fi_acc, As_mean, As_acc, cc, ccpb, resolution, seeds, burnin, thi):
+# Testing files
+#dirt = expanduser("~")+"/Plum_runs/HP1C/"
+#plomo = 'HP1C.csv'
+#carbon = 'HP1C-C.csv'
+
+
+def runmod(dirt, plomo, carbon,cs, Dircc, T_mod, T_mod_C, S_year, n_supp, det_lim, iterations, by, shape1_m, mean_m, shape_acc, mean_acc, fi_mean, fi_acc, As_mean, As_acc, cc, ccpb, resolution, seeds, burnin, thi):
     seed(int(seeds))
     # Data
     shape2_m = (shape1_m*(1-mean_m))/mean_m
     scale_acc = mean_acc/shape_acc
-    Data = genfromtxt(dirt+plomo, delimiter=',')
-    data = genfromtxt(dirt+carbon, delimiter=',')
+    if isfile(dirt+plomo):
+        Data = genfromtxt(dirt+plomo, delimiter=',')
+        Data = Data[1:, 1:]
+    else:
+        print("There is no lead file")
+    if isfile(dirt+carbon):
+        data = genfromtxt(dirt+carbon, delimiter=',')
+        data = data[1:, 1:]
+    if isfile(dirt+cs):
+        datacs = genfromtxt(dirt+cs, delimiter=',')
+#        datacs = datacs[1:, 1:]
+        if datacs.ndim == 1:
+            datacs = array([datacs, datacs])
+        Cs=False
+    else:
+        Cs=True
+
     if data.ndim == 1:
         data = array([data, data])
     # Radiocarbon data should be orded as
@@ -128,7 +150,7 @@ def runmod(dirt, plomo, carbon, Dircc, T_mod, T_mod_C, S_year, n_supp, det_lim, 
         return (1./lam)*log(fi/(lam*det_lim))  # ( (1/lam)*log(fi/det_lim) )
 
     def times(x, param):
-        param=param[:-1]
+        param = param[:-1]
         w = param[Ran+1]
         a = param[Ran+2:]
         t1 = m-1
@@ -148,8 +170,7 @@ def runmod(dirt, plomo, carbon, Dircc, T_mod, T_mod_C, S_year, n_supp, det_lim, 
         return ages
 
     def pendi(param):
-        param=param[:-1]
-        param=param[:-1]
+        param = param[:-1]
         w = param[Ran+1]
         a = param[Ran+2:]
         t1 = m-1
@@ -157,7 +178,7 @@ def runmod(dirt, plomo, carbon, Dircc, T_mod, T_mod_C, S_year, n_supp, det_lim, 
         while t1 > 0:
             ms1 = append(ms1, w*ms1[-1]+(1-w)*a[t1-1])
             t1 -= 1
-            ms = ms1[::-1]
+        ms = ms1[::-1]
         return ms
 
     def incallookup(points):
@@ -261,21 +282,28 @@ def runmod(dirt, plomo, carbon, Dircc, T_mod, T_mod_C, S_year, n_supp, det_lim, 
             u = u+(((data[i, 0]+param[-1]-mu)**2.)/((2.*sigm))) + .5*log(sigm)
             # log(lamda/alpha1)/2-((alpha1+1)/2)*log(1+(lamda/alpha1)*(data[i,0]-mu)**2)
         return u
-
+    if Cs==True:
+        def Cslike(param):
+            return 0.
+    else:
+        def Cslike(param):
+            tcs=times(datacs[:,2],param)
+            Tau=.5*(datacs[:,1]**-2.)
+            return sum(Tau*((tcs-(S_year-datacs[:,0]))**2.))
+    print('Iam here')
     if T_mod_C:
         log_dataC = Ux
     else:
         log_dataC = UxN
-        
+
     def reservoir(param):
         sigm = (500**2)
         u = (((param[-1])**2.)/((2.*sigm))) + .5*log(sigm)
         return u
 
     def obj(param):
-        objval = ln_like_supp(param) + ln_prior_supp(param) + log_dataC(param) + log_data(param)
+        objval = ln_like_supp(param) + ln_prior_supp(param) + log_dataC(param) + log_data(param) +Cslike(param)
         return objval
-
 
     # Initial valules
     print("Seaching initial values")
@@ -287,19 +315,19 @@ def runmod(dirt, plomo, carbon, Dircc, T_mod, T_mod_C, S_year, n_supp, det_lim, 
     w_ini0 = unif.rvs(size=1, loc=.3, scale=.3)  # .7
     m_ini_1 = unif.rvs(size=m, loc=0, scale=15)  # repeat(array(3.1),m,axis=0)
     m_ini_2 = unif.rvs(size=m, loc=0, scale=15)  # repeat(array(.5),m,axis=0)
-    rev_ini_0 = unif.rvs(size=1, loc=-500, scale=500)  
-    rev_ini_1 = unif.rvs(size=1, loc=-500, scale=500)  
+    rev_ini_0 = unif.rvs(size=1, loc=-500, scale=500)
+    rev_ini_1 = unif.rvs(size=1, loc=-500, scale=500)
     # print("here")
-    x = append(append(append(append(fi_ini_1, supp_ini_1), w_ini), m_ini_1),rev_ini_1)
-    xp = append(append(append(append(fi_ini_2, supp_ini_2), w_ini0), m_ini_2),rev_ini_0)
+    x = append(append(append(append(fi_ini_1, supp_ini_1), w_ini), m_ini_1), rev_ini_1)
+    xp = append(append(append(append(fi_ini_2, supp_ini_2), w_ini0), m_ini_2), rev_ini_0)
 
     while not support(x):
         m_ini_1 = unif.rvs(size=m, loc=0, scale=1)
-        x = append(append(append(append(fi_ini_1, supp_ini_1), w_ini), m_ini_1),rev_ini_1)
+        x = append(append(append(append(fi_ini_1, supp_ini_1), w_ini), m_ini_1), rev_ini_1)
 
     while not support(xp):
         m_ini_2 = unif.rvs(size=m, loc=0, scale=1)
-        xp = append(append(append(append(fi_ini_2, supp_ini_2), w_ini0), m_ini_2),rev_ini_0)
+        xp = append(append(append(append(fi_ini_2, supp_ini_2), w_ini0), m_ini_2), rev_ini_0)
 
 #	print("initial values were obtained")
 
@@ -348,14 +376,14 @@ def runmod(dirt, plomo, carbon, Dircc, T_mod, T_mod_C, S_year, n_supp, det_lim, 
                     # print((time.clock()-tiempomedir)/60)
                 i += 1
 
-    # Output=array(Output)
+    Output=array(Output)
     print("Acceptance rate")
     print((k0/(i+.0)))
 #	print("The twalk did", k, "iterations")
     Output = array(Output)
-    reser = Output[:,-2]
+    reser = Output[:, -2]
     savetxt(dirt+'Results/Reservoir.csv', reser, delimiter=',')
-    savetxt(dirt+'Results/Results_output.csv', delete(Output,-2,1), delimiter=',')
+    savetxt(dirt+'Results/Results_output.csv', delete(Output, -2, 1), delimiter=',')
     estim = []
     for i in range(iterations):
         estim.append(times(breaks, Output[i+1, :-1]))
@@ -399,10 +427,11 @@ def runmod(dirt, plomo, carbon, Dircc, T_mod, T_mod_C, S_year, n_supp, det_lim, 
 
     savetxt(dirt+"Results/Graphs.csv", array(y), delimiter=',')
     slopes = []
-    Output = delete(Output,-2,1)
     for i in range(iterations-1):
         slopes.append(pendi(Output[(i+1), :-1]))
     savetxt(dirt+"Results/Slopes.csv", array(slopes), delimiter=',')
+    savetxt(dirt+"210Pb.csv", Data, delimiter=',')
+    savetxt(dirt+"14C.csv", data, delimiter=',')
 
 
 # single lookup
@@ -663,7 +692,8 @@ class pytwalk:
         """
 
         sec = time()
-        print("pytwalk: Running the twalk with %d iterations." % (T,), strftime("%a, %d %b %Y, %H:%M.", localtime(sec)))
+        print("pytwalk: Running the twalk with %d iterations." %
+              (T,), strftime("%a, %d %b %Y, %H:%M.", localtime(sec)))
 
         # Check x0 and xp0 are in the support
         [rt, u, up] = self._SetUpInitialValues(x0, xp0)
@@ -1263,7 +1293,8 @@ def AutoMaxlag(Ser, c, rholimit=0.05, maxmaxlag=20000):
 
     if (maxlag >= min(T/2, maxmaxlag)):  # not enough data
         fixmaxlag = min(min(T/2, maxlag), maxmaxlag)
-        print("AutoMaxlag: Warning: maxlag= %d > min(T/2,maxmaxlag=%d), fixing it to %d" % (maxlag, maxmaxlag, fixmaxlag))
+        print("AutoMaxlag: Warning: maxlag= %d > min(T/2,maxmaxlag=%d), fixing it to %d" %
+              (maxlag, maxmaxlag, fixmaxlag))
         return fixmaxlag
 
     if (maxlag <= 1):
@@ -1440,7 +1471,8 @@ class pytwalk:
         """
 
         sec = time()
-        print("pytwalk: Running the twalk with %d iterations." % (T,), strftime("%a, %d %b %Y, %H:%M.", localtime(sec)))
+        print("pytwalk: Running the twalk with %d iterations." %
+              (T,), strftime("%a, %d %b %Y, %H:%M.", localtime(sec)))
 
         # Check x0 and xp0 are in the support
         [rt, u, up] = self._SetUpInitialValues(x0, xp0)
@@ -2040,7 +2072,8 @@ def AutoMaxlag(Ser, c, rholimit=0.05, maxmaxlag=20000):
 
     if (maxlag >= min(T/2, maxmaxlag)):  # not enough data
         fixmaxlag = min(min(T/2, maxlag), maxmaxlag)
-        print("AutoMaxlag: Warning: maxlag= %d > min(T/2,maxmaxlag=%d), fixing it to %d" % (maxlag, maxmaxlag, fixmaxlag))
+        print("AutoMaxlag: Warning: maxlag= %d > min(T/2,maxmaxlag=%d), fixing it to %d" %
+              (maxlag, maxmaxlag, fixmaxlag))
         return fixmaxlag
 
     if (maxlag <= 1):

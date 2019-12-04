@@ -19,7 +19,9 @@ def runmod(dirt, plomo, carbon, Dircc, T_mod, T_mod_C, S_year, n_supp, det_lim, 
     shape2_m = (shape1_m*(1-mean_m))/mean_m
     scale_acc = mean_acc/shape_acc
     Data = genfromtxt(dirt+plomo, delimiter=',')
+    Data = Data[1:, 1:]
     data = genfromtxt(dirt+carbon, delimiter=',')
+    data = data[1:, 1:]
     if data.ndim == 1:
         data = array([data, data])
     # Radiocarbon data should be orded as
@@ -959,7 +961,6 @@ class pytwalk:
 
     # Used by the Walk kernel
 
-
     def SimWalk(self, x, xp):
         aw = self.aw
         n = self.n
@@ -1048,6 +1049,7 @@ class pytwalk:
 
 #################################################################################
 # Output analysis auxiliar methods
+
 
     def IAT(self, par=-1, start=0, end=0, maxlag=0):
         """Calculate the Integrated Autocorrelation Times of parameters par
@@ -1139,7 +1141,6 @@ class pytwalk:
 
 
 # A simple Random Walk M-H
-
 
     def RunRWMH(self, T, x0, sigma):
         """Run a simple Random Walk M-H"""
@@ -1736,7 +1737,6 @@ class pytwalk:
 
     # Used by the Walk kernel
 
-
     def SimWalk(self, x, xp):
         aw = self.aw
         n = self.n
@@ -1825,6 +1825,7 @@ class pytwalk:
 
 #################################################################################
 # Output analysis auxiliar methods
+
 
     def IAT(self, par=-1, start=0, end=0, maxlag=0):
         """Calculate the Integrated Autocorrelation Times of parameters par
@@ -1916,7 +1917,6 @@ class pytwalk:
 
 
 # A simple Random Walk M-H
-
 
     def RunRWMH(self, T, x0, sigma):
         """Run a simple Random Walk M-H"""
